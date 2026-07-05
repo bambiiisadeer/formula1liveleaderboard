@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+body {
+  background: #15151e;
+  color: white;
+  margin-top: 0;
+}
+
+@font-face {
+  font-family: "Alphacorsa";
+  src: url("./assets/fonts/alphacorsa.personal-use.ttf");
+}
+
+@font-face {
+  font-family: "Magistral";
+  src: url("./assets/fonts/MagistralRegular.otf");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Magistral";
+  src: url("./assets/fonts/MagistralBold.otf");
+  font-weight: 700;
+}
+
+.font-alphacorsa {
+  font-family: "Alphacorsa", sans-serif;
+}
+
+.font-magistral {
+  font-family: "Magistral", sans-serif;
+}
