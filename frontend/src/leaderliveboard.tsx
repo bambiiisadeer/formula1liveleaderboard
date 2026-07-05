@@ -13,7 +13,7 @@ interface Entry {
   ms: number;
 }
 
-let idSeed = 1;
+const MAX_PARTICIPANTS = 22;
 
 const driverTeamLookup: Record<string, string> = {};
 TEAMS.forEach((team) => {
@@ -34,7 +34,9 @@ export default function LeaderLiveBoard() {
   const [mm, setMm] = useState("");
   const [ss, setSs] = useState("");
   const [mmm, setMmm] = useState("");
+  const [formError, setFormError] = useState<string | null>(null);
 
+  const idSeedRef = useRef(1);
   const ssRef = useRef<HTMLInputElement>(null);
   const mmmRef = useRef<HTMLInputElement>(null);
   const mmRef = useRef<HTMLInputElement>(null);
@@ -105,44 +107,65 @@ export default function LeaderLiveBoard() {
   };
 
   const handleAddEntry = () => {
-  const name = driverName.trim();
-  const mmN = parseInt(mm || "0", 10);
-  const ssN = parseInt(ss || "0", 10);
-  const mmmN = parseInt(mmm || "0", 10);
-  if (!name || (mmN === 0 && ssN === 0 && mmmN === 0)) return;
+    const name = driverName.trim();
+    const mmN = parseInt(mm || "0", 10);
+    const ssN = parseInt(ss || "0", 10);
+    const mmmN = parseInt(mmm || "0", 10);
 
-  const ms = mmN * 60000 + ssN * 1000 + mmmN;
-  const teamKey =
-    selectedTeam ?? driverTeamLookup[name.toLowerCase()] ?? null;
-  const team = TEAMS.find((t) => t.key === teamKey);
-  const color = team ? team.color : "#B2B2B2";
+    if (!name) {
+      setFormError("Please select or enter a driver name.");
+      return;
+    }
+    if (mmN === 0 && ssN === 0 && mmmN === 0) {
+      setFormError("Please enter a valid lap time.");
+      return;
+    }
 
-  const existing = entries.find(
-    (e) => e.name.toLowerCase() === name.toLowerCase(),
-  );
-
-  if (existing) {
-    setEntries((prev) =>
-      prev.map((e) =>
-        e.id === existing.id ? { ...e, teamKey, color, ms } : e,
-      ),
+    const existing = entries.find(
+      (e) => e.name.toLowerCase() === name.toLowerCase(),
     );
-    setHighlightedEntryId(existing.id);
-  } else {
-    const newEntry: Entry = { id: idSeed++, name, teamKey, color, ms };
-    setEntries((prev) => [...prev, newEntry]);
-    setHighlightedEntryId(newEntry.id);
-  }
 
-  setLastUpdated(new Date().toTimeString().slice(0, 8));
-  setTimeout(() => setHighlightedEntryId(null), 1000);
+    if (!existing && entries.length >= MAX_PARTICIPANTS) {
+      setFormError(`Leaderboard is full (max ${MAX_PARTICIPANTS} participants).`);
+      return;
+    }
 
-  setDriverName("");
-  setMm("");
-  setSs("");
-  setMmm("");
-  setSelectedTeam(null);
-};
+    setFormError(null);
+
+    const ms = mmN * 60000 + ssN * 1000 + mmmN;
+    const teamKey =
+      selectedTeam ?? driverTeamLookup[name.toLowerCase()] ?? null;
+    const team = TEAMS.find((t) => t.key === teamKey);
+    const color = team ? team.color : "#B2B2B2";
+
+    if (existing) {
+      setEntries((prev) =>
+        prev.map((e) =>
+          e.id === existing.id ? { ...e, teamKey, color, ms } : e,
+        ),
+      );
+      setHighlightedEntryId(existing.id);
+    } else {
+      const newEntry: Entry = {
+        id: idSeedRef.current++,
+        name,
+        teamKey,
+        color,
+        ms,
+      };
+      setEntries((prev) => [...prev, newEntry]);
+      setHighlightedEntryId(newEntry.id);
+    }
+
+    setLastUpdated(new Date().toTimeString().slice(0, 8));
+    setTimeout(() => setHighlightedEntryId(null), 1000);
+
+    setDriverName("");
+    setMm("");
+    setSs("");
+    setMmm("");
+    setSelectedTeam(null);
+  };
 
   const blendColor = (
     foreground: string,
@@ -176,6 +199,7 @@ export default function LeaderLiveBoard() {
 
   const sortedEntries = [...entries].sort((a, b) => a.ms - b.ms);
   const visibleEntries = sortedEntries;
+  const isFull = entries.length >= MAX_PARTICIPANTS;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -195,7 +219,7 @@ export default function LeaderLiveBoard() {
       {/* header */}
       <div className="flex items-center h-16 bg-[#1D1D27] px-4">
         <img
-          src="src/assets/images/f1logo.png"
+          src="/src/assets/images/f1logo.png"
           alt="Logo"
           className="h-full w-auto mr-4"
         />
@@ -231,7 +255,9 @@ export default function LeaderLiveBoard() {
                 {entries.length}
               </span>
               <span className="font-magistral font-bold text-sm -mr-1">/</span>
-              <span className="font-magistral font-bold text-sm">20</span>
+              <span className="font-magistral font-bold text-sm">
+                {MAX_PARTICIPANTS}
+              </span>
               <span className="font-magistral font-bold text-[#B2B2B2] text-sm">
                 PARTICIPANTS
               </span>
@@ -306,9 +332,9 @@ export default function LeaderLiveBoard() {
                     {pos}
                   </span>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
                     <div
-                      className="w-7 h-7 rounded-full flex-none overflow-hidden"
+                      className="w-6 h-6 rounded-full flex-none overflow-hidden"
                       style={{ background: entry.color }}
                     >
                       {driverPhoto && (
@@ -320,10 +346,10 @@ export default function LeaderLiveBoard() {
                       )}
                     </div>
                     <span className="font-magistral text-sm">
-                      <span className="text-[#B2B2B2]">
+                      <span className="text-white">
                         {entry.name.split(" ")[0]}{" "}
                       </span>
-                      <span className="font-bold text-white">
+                      <span className="font-bold text-white ml-2">
                         {entry.name.split(" ").slice(1).join(" ")}
                       </span>
                     </span>
@@ -371,7 +397,7 @@ export default function LeaderLiveBoard() {
         <div className="flex-1 bg-[#17171F] border border-[#303039] rounded-xl px-6 pt-4 pb-6 flex flex-col gap-7">
           <div className="flex items-center gap-3.5">
             <img
-              src="src/assets/icons/boxicons_helmet-filled.svg"
+              src="/src/assets/icons/boxicons_helmet-filled.svg"
               alt="helmet"
               className="w-5.5 h-5.5"
             />
@@ -520,17 +546,36 @@ export default function LeaderLiveBoard() {
               className="h-10 w-14.5 border border-[#303039] rounded -mt-4 bg-[#D9D9D9]/3 flex items-center px-3 justify-center text-center font-magistral text-white placeholder:text-[#666670] text-sm focus:outline-none focus:border-[#4E4E5B]"
             />
           </div>
-          <div className="flex items-center gap-2 mt-2">
-            <MdError className="text-[#B2B2B2] text-sm" />
-            <span className="font-magistral text-[#B2B2B2] text-xs">
-              The new entry will be added at the correct position automatically.
-            </span>
-          </div>
+
+          {formError && (
+            <div className="flex items-center gap-2 mt-2">
+              <MdError className="text-[#FF4D4D] text-sm" />
+              <span className="font-magistral text-[#FF4D4D] text-xs">
+                {formError}
+              </span>
+            </div>
+          )}
+
+          {!formError && (
+            <div className="flex items-center gap-2 mt-2">
+              <MdError className="text-[#B2B2B2] text-sm" />
+              <span className="font-magistral text-[#B2B2B2] text-xs">
+                The new entry will be added at the correct position automatically.
+              </span>
+            </div>
+          )}
+
           <button
             onClick={handleAddEntry}
-            className="bg-[#F70000] hover:bg-[#DD0000] text-white font-magistral font-bold  text-sm py-2 px-4 rounded-full flex items-center justify-center gap-2.5 -mt-2"
+            disabled={isFull}
+            className={`font-magistral font-bold text-sm py-2 px-4 rounded-full flex items-center justify-center gap-2.5 -mt-2 ${
+              isFull
+                ? "bg-[#303039] text-[#666670] cursor-not-allowed"
+                : "bg-[#F70000] hover:bg-[#DD0000] text-white"
+            }`}
           >
-            <CgPlayListAdd className="size-5" /> ADD TO LEADERBOARD
+            <CgPlayListAdd className="size-5" />
+            {isFull ? "LEADERBOARD FULL" : "ADD TO LEADERBOARD"}
           </button>
         </div>
       </div>
