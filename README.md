@@ -1,11 +1,11 @@
 ````md
-# F1 Live Leaderboard
+#  F1 Live Leaderboard
 
 A single-page React + TypeScript application that simulates a live **Formula 1** lap-time leaderboard. Users can add new driver lap times through an interactive form, and the leaderboard automatically updates by sorting drivers from the fastest to the slowest lap.
 
 ---
 
-## Features
+##  Features
 
 - Live Formula 1 style leaderboard
 -  Automatic lap time sorting (fastest lap first)
@@ -20,7 +20,7 @@ A single-page React + TypeScript application that simulates a live **Formula 1**
 
 ---
 
-## Tech Stack
+##  Tech Stack
 
 - React
 - TypeScript
@@ -30,7 +30,7 @@ A single-page React + TypeScript application that simulates a live **Formula 1**
 
 ---
 
-## Prerequisites
+##  Prerequisites
 
 Before running the project, make sure you have:
 
@@ -39,7 +39,7 @@ Before running the project, make sure you have:
 
 ---
 
-## Installation
+##  Installation
 
 Clone the repository:
 
@@ -73,7 +73,7 @@ http://localhost:5173
 
 ---
 
-## Project Structure
+##  Project Structure
 
 ```
 src/
@@ -86,7 +86,7 @@ src/
 
 ---
 
-## Usage
+##  Usage
 
 1. Select a Formula 1 team *(optional)*.
 2. Choose a driver from the dropdown list.
@@ -108,7 +108,7 @@ Example:
 
 ---
 
-## Leaderboard Logic
+##  Leaderboard Logic
 
 - Entries are sorted automatically by lap time (ascending).
 - The fastest lap is displayed in **P1**.
@@ -119,7 +119,7 @@ Example:
 
 ---
 
-## Limitations
+##  Limitations
 
 - Maximum supported participants: **22**
 - Lap times must be entered manually.
