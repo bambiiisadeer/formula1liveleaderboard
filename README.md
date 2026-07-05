@@ -34,40 +34,43 @@ A single-page React + TypeScript application that simulates a live Formula 1 lap
 Before running the project, make sure you have:
 
 - Node.js 18+
-- npm
+- pnpm
 
 ---
 
 ## Installation
 
-Clone the repository:
+Extract the zip file, then navigate into the project folder:
 
 ```bash
-git clone <repository-url>
-```
-
-Navigate to the project folder:
-
-```bash
-cd <project-folder>
+cd frontend
 ```
 
 Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 Start the development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 The application will be available at:
 
 ```text
 http://localhost:5173
+```
+
+---
+
+## Build for Production
+
+```bash
+pnpm build
+pnpm preview
 ```
 
 ---
@@ -115,6 +118,7 @@ Example:
 - The first-place row is highlighted using the driver's team color.
 - Driver photos and team logos are displayed when available.
 - The **Last Updated** timestamp is refreshed whenever a new entry is added.
+- Team color is used in place of a flag, since it maps naturally to each driver's team in Formula 1.
 
 ---
 
