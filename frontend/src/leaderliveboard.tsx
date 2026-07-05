@@ -208,7 +208,7 @@ export default function LeaderLiveBoard() {
           0% { transform: scale(1); }
           30% { transform: scale(1.03); }
           100% { transform: scale(1); }
-        }
+        } 
         .row-just-added {
           animation: rowJustAdded 0.8s ease-in-out;
           transform-origin: center;
